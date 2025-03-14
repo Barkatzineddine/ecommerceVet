@@ -43,6 +43,11 @@ const Navbar = () => {
                 <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
             </NavLink>
 
+            <NavLink to='/orders' className='flex flex-col items-center gap-1 ' >
+                <p>ORDERS</p>
+                <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
+            </NavLink>
+
             <NavLink to='/about' className='flex flex-col items-center gap-1 ' >
                 <p>ABOUT</p>
                 <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
@@ -52,6 +57,8 @@ const Navbar = () => {
                 <p>CONTACT</p>
                 <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
             </NavLink>
+
+            
                     
         </ul>
 
