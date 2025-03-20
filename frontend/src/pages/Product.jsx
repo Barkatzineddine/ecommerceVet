@@ -4,28 +4,41 @@ import { shopContext } from '../context/ShopContext';
 import starIcon from '../assets/starIcon.svg'
 import starDullIcon from '../assets/starDullIcon.svg'
 import RelatedProduct from '../components/RelatedProduct';
+import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import { toast } from 'react-toastify';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import "../index.css"
+
+
+// import required modules
+import { Navigation } from 'swiper/modules';
 
 
 const Product = () => {
 
   const {productId} = useParams();
-  const {products,currency,addToCart} = useContext(shopContext)
+  const {products,currency,addToCart,backendUrl,token,ratings} = useContext(shopContext)
   const [productData,setProductData] = useState(false)
-  const [image,setImage] = useState('')
   const [size,setSize] = useState('')
   const [maxScrollImagesHeight,setMaxScrollImagesHeight] = useState(null)
   const [rating,setRating] = useState(0)
+  const [ratingNumber,setRatingNumber] = useState(0)
+  const [indexImage,setIndexImage] = useState(0)
+  const swiperRef = useRef(null);
 
-
+  // Function to go to the clicked image
+  const goToSlide = (index) => {
+    if (swiperRef.current) {
+      swiperRef.current.slideTo(index);
+    }
+  };
 
   const fetchProductData = async() =>{
 
@@ -39,10 +52,49 @@ const Product = () => {
     })
   }
 
+  const setRatingHandler = async(rating,productId)=>{
+
+    try{
+
+      const response = await axios.post(backendUrl + '/api/product/rating',{ratingValue:rating,productId},{headers:{token}})
+      if (response.data.success){    
+        toast.success(response.data.message)
+      }else{
+        toast.error(response.data.message)
+      }
+
+    }catch(error){
+
+      console.log(error)
+      toast.error("An Error Has Occured ")
+
+    }
+    
+  }
+
+  const calculateRating = async()=>{
+
+    const productRatings = ratings.filter(r => r.productId === productId);
+    if (productRatings.length === 0){
+        setRating(0);
+        setRatingNumber(0)
+        return 0;
+    }
+    const total = productRatings.reduce((sum, r) => sum + r.rating, 0);
+    setRating(total / productRatings.length)
+    setRatingNumber(productRatings.length)
+  }
+  
+  const handleSlideChange = (swiper) => {
+    setIndexImage(swiper.activeIndex)
+    console.log(swiper.activeIndex)
+  };
+
  
 
   useEffect(()=>{
     fetchProductData();
+    calculateRating()
   },[productId,products])
 
 
@@ -53,34 +105,38 @@ const Product = () => {
       <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
 
         {/* Product Images */}
-        <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row'>
+        <div className=' flex-1 min-w-0 flex flex-col-reverse gap-3 sm:flex-row '>
 
           <div className={`max-h-[${maxScrollImagesHeight}] flex sm:flex-col overflow-x-auto overflow-y-scroll  sm:justify-normal sm:w-[22%] w-full`}>
             {
               productData.image.map((item,index)=>(
-                <img onClick={()=>setImage(item)} key={index} src={item} alt="image" className='w-[23%] mx-auto aspect-[171/192] justify-center h-auto sm:w-full mr-auto sm:mb-3 flex-shrink-0 cursor-pointer  object-cover'  />
+                <img onClick={()=>goToSlide(index)} key={index} src={item} alt="image" className={`${indexImage == index?"border-orange-500 border-2":""} w-[23%] mx-auto aspect-[171/192] justify-center h-auto sm:w-full mr-auto sm:mb-3 flex-shrink-0 cursor-pointer  object-cover`}/>
               ))
             }
           </div>
 
           <div className='w-full sm:w-[78%] max-w-[600px]'> 
-          <Carousel className="relative">
-            <CarouselContent>
-            {
+       
+
+          <Swiper navigation={true} modules={[Navigation]} className="mySwiper min-w-0 "
+          
+          
+          onSwiper={(swiper) => (swiperRef.current = swiper)}
+          onSlideChange={(swiper) => handleSlideChange(swiper)}
+          >
+
+
+          {
               productData.image.map((item,index)=>(
-                <CarouselItem>
+                <SwiperSlide className='min-w-0 h-[100%]'>
                     
-                  <img onClick={()=>setImage(item)} key={index} src={item} alt="image" className='w-full sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer h-[100%] object-cover'  />
+                  <img onClick={()=>setImage(item)} key={index} src={item} alt={`Slide ${index}`} className='w-full min-w-0 sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer h-[100%] object-cover aspect-[9/12]'  />
 
-                </CarouselItem>
+                </SwiperSlide>
               ))
-            }   
-                    
-            </CarouselContent>
-            <CarouselPrevious className='-left-1 w-[50px] h-[50px] bg-[#ffffff91] border-none'/>
-            <CarouselNext className='-right-1 w-[50px] h-[50px] bg-[#ffffff88] border-none'/>
-          </Carousel>
-
+            }  
+       
+          </Swiper>
           
           
 
@@ -88,7 +144,7 @@ const Product = () => {
 
         </div>
             {/*--------------- Product Info  ------------------- */}
-        <div className='flex-1'>
+        <div className='flex-1 text-base md:text-sm lg:text-lg'>
             <h1 className='font-medium text-2xl mt-2'>{productData.name}</h1>
             <div className='flex items-center gap-1 mt-2'>
             
@@ -96,19 +152,20 @@ const Product = () => {
                 <Rating
                   name="half-rating" 
                   size='large'
-                  defaultValue={0} 
+                  value={rating} 
                   precision={0.5}
                   onChange={(event, newValue) => {
+                    setRatingHandler(newValue,productData._id)
                     setRating(newValue);
                   }} 
                 />
               </Stack>
 
-              <p className='pl-2'>({rating})</p>
+              <p className='pl-2'>({ratingNumber})</p>
 
             </div>
-            <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
-            <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
+            <p className='mt-5 text-3xl font-medium'>{productData.sellingPrice} {currency}</p>
+            <p className='mt-5 text-gray-500 md:w-4/5'>{productData.shortDescription}</p>
             <div className='flex flex-col gap-4 my-8'>
               <p>Select Size</p>
               <div className='flex gap-2'>
@@ -133,8 +190,7 @@ const Product = () => {
           <b className='border px-5 py-3 text-sm'> Description</b>
         </div>
         <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, beatae ullam quasi pariatur repellendus saepe provident placeat at, dicta laboriosam dolorum natus culpa cum officia fugit libero hic repellat. Tenetur similique esse natus incidunt distinctio itaque illum quasi asperiores optio. Rem eligendi veritatis nobis aspernatur! Ab ducimus quia rerum laudantium accusamus est, fugiat quisquam et nam, sunt doloribus explicabo aut?</p>
-          <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eum eveniet hic distinctio velit nobis voluptatem delectus? Qui nobis ad ullam molestias expedita aspernatur dicta, dolor consectetur? Odio ea dignissimos delectus cum sequi!</p>
+          <p>{productData.longDescription}</p>
         </div>
       </div>
 

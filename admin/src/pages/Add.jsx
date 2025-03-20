@@ -3,6 +3,7 @@ import { assets } from '../assets/assets'
 import axios from 'axios'
 import {backendUrl} from '../App'
 import { toast } from 'react-toastify'
+import ClipLoader from "react-spinners/ClipLoader";
 
 const Add = ({token}) => {
 
@@ -12,22 +13,31 @@ const Add = ({token}) => {
   const [image4,setImage4] = useState(false)
 
   const [name,setName] = useState("")
-  const [description,setDescription] = useState("")
-  const [price,setPrice] = useState("")
+  const [longDescription,setLongDescription] = useState("")
+  const [shortDescription,setShortDescription] = useState("")
+  const [purchasePrice,setPurchasePrice] = useState(0)
+  const [sellingPrice,setSellingPrice] = useState(0)
+  const [quantity,setQuantity] = useState(0)
   const [category,setCategory] = useState("Men")
   const [subCategory,setSubCategory] = useState("Topwear")
   const [bestseller,setBestseller] = useState(false)
   const [sizes,setSizes] = useState([])
+  let [loading, setLoading] = useState(false);
+  let [color, setColor] = useState("#c586ac");
 
   const onSubmitHandler = async(e) =>{
     e.preventDefault();
 
     try{
 
+      setLoading(true)
       const formData = new FormData()
       formData.append("name", name)
-      formData.append("description",description)
-      formData.append("price", price)
+      formData.append("quantity", quantity)
+      formData.append("shortDescription",shortDescription)
+      formData.append("longDescription",longDescription)
+      formData.append("sellingPrice", sellingPrice)
+      formData.append("purchasePrice", purchasePrice)
       formData.append("category", category)
       formData.append("subCategory", subCategory)
       formData.append("bestseller", bestseller)
@@ -41,14 +51,18 @@ const Add = ({token}) => {
       const response = await axios.post(backendUrl + "/api/product/add",formData,{headers:{token}})
 
       if(response.data.success){
+        setLoading(false)
         toast.success(response.data.message)
         setName('')
-        setDescription('')
+        setLongDescription("")
+        setShortDescription("")
         setImage1(false)
         setImage2(false)
         setImage3(false)
         setImage4(false)
-        setPrice('')
+        setPurchasePrice('')
+        setSellingPrice('')
+        setQuantity('')
       }else{
         toast.error(response.data.message)
       }
@@ -61,6 +75,22 @@ const Add = ({token}) => {
   }
 
   return (
+    <>{
+      loading?
+
+      <div className='w-full h-[100vh] flex flex-row justify-center items-center'>
+
+        <ClipLoader
+        color={color}
+        loading={loading}
+        size={150}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+        />
+
+      </div>
+    
+      :
     <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3'>
         <div>
           <p className='mb-2'>Upload Image</p>
@@ -94,14 +124,19 @@ const Add = ({token}) => {
         </div>
 
         <div className='w-full'>
-          <p className='mb-2'>Product description</p>
-          <textarea onChange={(e)=>setDescription(e.target.value)} value={description} className='w-full max-w[500px] px-3 py-2' type="text" placeholder='Write content here' required />
+          <p className='mb-2'>Product short description</p>
+          <textarea onChange={(e)=>setShortDescription(e.target.value)} value={shortDescription} className='w-full max-w[500px] px-3 py-2' type="text" placeholder='Write content here' required />
         </div>
 
-        <div className='flex flex-col sm:flex-row gap-2 w-full sm:gap-8'>
+        <div className='w-full'>
+          <p className='mb-2'>Product long description</p>
+          <textarea onChange={(e)=>setLongDescription(e.target.value)} value={longDescription} className='w-full max-w[500px] px-3 py-2' type="text" placeholder='Write content here' required />
+        </div>
+
+        <div className='flex flex-col flex-wrap sm:flex-row gap-2 w-full sm:gap-8'>
           <div>
             <p className='mb-2 '>Product category</p>
-            <select onChange={(e)=>setCategory(e.target.value)} className='w-full px-3 py-2'>
+            <select onChange={(e)=>setCategory(e.target.value)} className='w-full px-3 py-2 sm:w-[140px]'>
               <option value="Men">Men</option>
               <option value="Women">Women</option>
               <option value="Kids">Kids</option>
@@ -110,7 +145,7 @@ const Add = ({token}) => {
 
           <div>
             <p className='mb-2 '>Sub category</p>
-            <select onChange={(e)=>setSubCategory(e.target.value)} className='w-full px-3 py-2'>
+            <select onChange={(e)=>setSubCategory(e.target.value)} className='w-full  px-3 py-2 sm:w-[120px]'>
               <option value="Topwear">Topwear</option>
               <option value="Bottomwear">Bottomwear</option>
               <option value="Winterwear">Winterwear</option>
@@ -118,9 +153,19 @@ const Add = ({token}) => {
           </div>
 
           <div>
-            <p className='mb-2'>Product Price</p>
-            <input onChange={(e)=>setPrice(e.target.value)} value={price} className='w-full px-3 py-2 sm:w-[120px]' type="Number" placeholder='25' />
-          </div>       
+            <p className='mb-2'>Selling Price</p>
+            <input onChange={(e)=>setSellingPrice(e.target.value)} value={sellingPrice} className='w-full px-3 py-2 sm:w-[130px]' type="Number" placeholder='25' />
+          </div>  
+
+          <div>
+            <p className='mb-2'>Purchase Price</p>
+            <input onChange={(e)=>setPurchasePrice(e.target.value)} value={purchasePrice} className='w-full px-3 py-2 sm:w-[130px]' type="Number" placeholder='25' />
+          </div>      
+
+          <div>
+            <p className='mb-2'>Stock Quantity</p>
+            <input onChange={(e)=>setQuantity(e.target.value)} value={quantity} className='w-full px-3 py-2 sm:w-[130px]' type="Number" placeholder='25' />
+          </div>  
         </div>
 
         <div>
@@ -156,6 +201,8 @@ const Add = ({token}) => {
         <button type='submit' className='w-28 py-3 mt-4 bg-black text-white'>ADD</button>
 
     </form>
+    }
+    </>
   )
 }
 

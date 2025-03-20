@@ -8,6 +8,13 @@ a.active hr{
   display: block;
 }
 
+
+
+
+.swiper-button-prev{
+  height: 35px;
+}
+
 *{
   font-kerning: Outfit;
 }

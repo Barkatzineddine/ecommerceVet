@@ -18,6 +18,7 @@ const ShopContextProvider = (props) => {
     const [showSearch,setShowSearch] = useState(false)
     const [cartItems,setCartItems] = useState({})
     const [products,setProducts] = useState([])
+    const [ratings,setRatings] = useState([])
     const [token,setToken] = useState("")
     const navigate = useNavigate();
 
@@ -104,10 +105,10 @@ const ShopContextProvider = (props) => {
             for(const item in cartItems[items]){
                 try{
                     if(cartItems[items][item] > 0){
-                        totalAmount += itemInfo.price * cartItems[items][item]
+                        totalAmount += itemInfo.sellingPrice * cartItems[items][item]
                     }
                 }catch(error){
-                    console;log(error.message)
+                    console.log(error.message)
                     toast.error(error.message)
                 }
             }
@@ -132,6 +133,23 @@ const ShopContextProvider = (props) => {
         }
     }
 
+    const getRatings = async() => {
+        try{
+            const response = await axios.get(backendUrl + '/api/rating/list')
+            if(response.data.success){
+                
+                setRatings(response.data.ratings)
+            }else{
+                toast.error(response.data.message)
+                console.log(response.data.message)
+            }
+
+        }catch(error){
+            console.log(error.message)
+            toast.error(error.message)
+        }
+    }
+
     const getUserCart = async () =>{
 
         try{
@@ -142,7 +160,7 @@ const ShopContextProvider = (props) => {
                 setCartItems(response.data.cartData)
                
             }else{
-                console.log(response.data)
+                //console.log(response.data)
             }
 
         }catch(error){
@@ -153,6 +171,7 @@ const ShopContextProvider = (props) => {
 
     useEffect(()=>{
         getProductsData()
+        getRatings()
     },[])
 
     useEffect(()=>{
@@ -169,7 +188,7 @@ const ShopContextProvider = (props) => {
     },[token])
   
     const value = {
-        products,currency,delivery_fee,
+        products,currency,delivery_fee,ratings,
         search,setSearch,showSearch,setShowSearch,
         cartItems,addToCart,setCartItems,
         getCartCount,updateQuantity,

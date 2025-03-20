@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.7",
     "@radix-ui/react-slot": "^1.1.2",
     "axios": "^1.7.9",
@@ -25,7 +26,7 @@
     "react-simple-star-rating": "^5.1.7",
     "react-toastify": "^10.0.6",
     "star-rating-react-ts": "^1.1.4",
-    "swiper": "^11.2.4",
+    "swiper": "^11.2.6",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
   },

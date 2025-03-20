@@ -15,8 +15,33 @@ import NotFound from './pages/NotFound'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import PlaceOrder from './pages/PlaceOrder'
+import { useContext,useState,useEffect } from 'react'
+import { shopContext } from './context/ShopContext'
+import axios from 'axios'
+
 
 export default function App() {
+  const {token,backendUrl} = useContext(shopContext);
+  const [authorized,setAuthorized] = useState(false)
+
+  const getAuthorization = async()=>{
+    try{
+
+      const response = await axios.post(backendUrl + '/api/order/userorders',{},{headers:{token}})
+      if (response.data.success){
+        setAuthorized(true)
+      }
+
+    }catch(error)  {
+      console.log(error.message)
+      toast.error("an error has occured")
+    }}
+    
+
+  useEffect(()=>{
+    getAuthorization()
+  },[token])
+
   return (
     <div className='px-4 sm:px-5 md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />
@@ -31,7 +56,7 @@ export default function App() {
         <Route path='/cart' element={<Cart/>} />
         <Route path='/login' element={<Login/>} />
         <Route path='/place-order' element={<PlaceOrder/>} />
-        <Route path='/orders' element={<Orders/>} />
+        {authorized?<Route path='/orders' element={<Orders/>}/>:null}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer/>

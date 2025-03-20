@@ -5,6 +5,7 @@ import {Routes,Route} from 'react-router-dom'
 import Add from './pages/Add'
 import List from './pages/List'
 import Orders from './pages/Orders'
+import Rapport from './pages/Rapport'
 import Login from './components/Login'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -12,7 +13,7 @@ import axios from 'axios'
 
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
-export const currency = '$'
+export const currency = 'DA'
 
 const App = () => {
 
@@ -28,7 +29,6 @@ const App = () => {
           token:token,
         }
       })
-      console.log(response)
       if(!response.data.success){
         localStorage.setItem('token','')
         setToken('')
@@ -60,6 +60,7 @@ const App = () => {
                 <Route path='/add' element={<Add token={token}/>}/>
                 <Route path='/list' element={<List token={token}/>}/>
                 <Route path='/orders' element={<Orders token={token}/>}/>
+                <Route path='/rapport' element={<Rapport token={token}/>}/>
               </Routes>
             </div>
           </div>

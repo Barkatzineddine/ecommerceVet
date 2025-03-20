@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState,useEffect } from 'react'
 import logo from '../assets/logo.svg';
 import { NavLink } from 'react-router-dom';
 import searchIcon from "../assets/searchIcon.svg"
@@ -8,20 +8,42 @@ import { Link } from 'react-router-dom';
 import menuIcon from '../assets/menuIcon.svg'
 import closeIcon from '../assets/closeIcon.png'
 import { shopContext } from '../context/ShopContext';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const Navbar = () => {
 
     const [visible,setVisible] = useState(false)
-
-    const {setShowSearch,getCartCount,navigate,token,setToken,setCartItems} = useContext(shopContext)
+    const [authorized,setAuthorized] = useState(false)
+    const {setShowSearch,getCartCount,navigate,token,setToken,setCartItems,backendUrl} = useContext(shopContext)
 
     const logout = () =>{
         navigate('/login')
         localStorage.removeItem('token')
         setToken('')
-        setCartItems({})
-        
+        setCartItems({})      
     }
+
+    const getAuthorization = async()=>{
+        try{
+    
+          const response = await axios.post(backendUrl + '/api/order/userorders',{},{headers:{token}})
+          if (response.data.success){
+            setAuthorized(true)
+          }else{
+            setAuthorized(false)
+          }
+    
+        }catch(error)  {
+            setAuthorized(false)
+            console.log(error.message)
+            toast.error("an error has occured")
+        }}
+        
+    
+      useEffect(()=>{
+        getAuthorization()
+      },[token])
 
   return (
 
@@ -58,7 +80,12 @@ const Navbar = () => {
                 <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
             </NavLink>
 
-            
+
+            {authorized?<NavLink to='/orders' className='flex flex-col items-center gap-1 ' >
+                <p>ORDERS</p>
+                <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
+            </NavLink>:null}
+
                     
         </ul>
 
@@ -105,6 +132,10 @@ const Navbar = () => {
 
                 <NavLink onClick={()=>setVisible(false)} to='/collection' className='py-3 pl-6 border' >
                     <p>COLLECTION</p>
+                </NavLink>
+
+                <NavLink onClick={()=>setVisible(false)} to='/orders' className='py-3 pl-6 border' >
+                    <p>ORDERS</p>
                 </NavLink>
 
                 <NavLink onClick={()=>setVisible(false)} to='/about' className='py-3 pl-6 border' >

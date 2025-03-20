@@ -1,0 +1,147 @@
+import React, { useState ,useEffect, useContext} from 'react'
+import { toast } from 'react-toastify'
+import axios from 'axios'
+import {backendUrl, currency} from '../App'
+import { assets } from '../assets/assets'
+import { rapportContext } from '../contex/rapportContext'
+
+
+
+const Rapport = ({token}) => {
+
+    const {totalProducts, deliveredOrders} = useContext(rapportContext)
+    const [date, setDate] = useState(new Date())
+    const [selectedMonth, setSelectedMonth] = useState(date.getMonth()+1);
+    const [selectedYear, setSelectedYear] = useState(date.getFullYear());
+    const [revenus, setRevenus] = useState(0)
+    const [filteredOrders, setFilterOrders] = useState([])
+
+    const months = [
+      "January", "February", "March", "April", "May", "June", 
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i); 
+
+   
+      const getRevenus = async (month, year) =>{
+        if (!token){
+            return null;
+        } 
+        try{
+
+              var totalAmount = 0
+              const filteredOrders = deliveredOrders.map((order,index)=>{
+              const date = new Date(order.date)
+              const year = date.getFullYear()            
+              const month = date.getMonth() + 1
+              if(year == selectedYear && month == selectedMonth ){
+                console.log("2")
+                return order
+              }
+            })
+              setFilterOrders(filteredOrders)
+              totalAmount = filteredOrders.reduce((sum, order) => order?sum + order.amount:0, 0); 
+              setRevenus(totalAmount)
+            
+            
+
+        }catch(error){
+          console.log(error.message)
+          toast.error("an error has occured")
+        }  
+      }
+
+     
+
+
+      useEffect(()=>{
+        getRevenus()
+      },[selectedMonth,selectedYear,token,deliveredOrders])
+
+
+
+
+  return (
+    <div className='relative'>
+        <div>Rapport</div>
+        <div className='absolute right-2 top-2'>
+
+
+          <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}  className='p-2 font-semibold bg-white mr-2 cursor-pointer'>
+            <option value="">Select Month</option>
+            {months.map((month, index) => (
+            <option key={index} value={index+1}>{month}</option>
+            ))}
+          </select>
+
+
+          <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className='p-2 font-semibold bg-white cursor-pointer'>
+            <option value="">Select Year</option>
+            {years.map((year) => (
+            <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+
+        </div>
+        
+        <div>Total revenus of the month: {revenus} {currency}</div>
+        <div>Total Product: {totalProducts}</div>
+        <div>total sales for the month : {filteredOrders.filter(order => order !== undefined).length}</div>
+        
+        
+       
+        
+        {  
+
+            filteredOrders.map((order,index)=>(
+              order?
+              <div className='relative grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700' key={index}>
+                  <img className='w-12' src={assets.parcel_icon} alt="parcel" />
+                  <div>
+                  <div>
+                    {order.items.map((item,index)=>{
+
+                      if (index === order.items.length - 1){
+
+                        return <p  className='py-0.5' key={index}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
+
+                      }else{
+
+                        return <p className='py-0.5' key={index}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
+
+
+                      }
+
+                    })}
+                  </div>
+                  <p className='mt-3 mb-2 font-medium' >{order.address.firstName + " " + order.address.lastName}</p>
+
+                  <div>
+                    <p>{order.address.street + ","}</p>
+                    <p>{order.address.city + "," + order.address.state + "," + order.address.country + "," + order.address.zipcode}</p>
+                  </div>
+
+                  <p>{order.address.phone}</p>
+
+                </div>
+
+                <div>
+                  <p className='text-sm sm:text-[15px]' >items : {order.items.length}</p>
+                  <p className='mt-3' >Method : {order.paymentMethod}</p>
+                  <p>Payment : { order.payment ? 'Done' : "Pending" }</p>
+                  <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+                </div>
+
+                <p className='text-sm sm:text-[15px]' >{order.amount} {currency}</p>            
+                
+              </div>:null
+            )
+            
+          )
+          }
+    </div>
+  )
+}
+
+export default Rapport

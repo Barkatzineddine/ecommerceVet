@@ -8,7 +8,7 @@ const Orders = () => {
 
   const {backendUrl, token, currency} = useContext(shopContext);
   const [orderData,setOrderData] = useState([])
-  console.log("order data :",orderData)
+  const [authorized,setAuthorized] = useState(false)
 
   const loadOrderData = async () =>{
     try{
@@ -38,12 +38,31 @@ const Orders = () => {
     }
   }
 
+  const getAuthorization = async()=>{
+    try{
+
+      const response = await axios.post(backendUrl + '/api/order/userorders',{},{headers:{token}})
+      if (response.data.success){
+        setAuthorized(true)
+      }else{
+        toast.error(response.data.message)
+      }
+
+    }catch(error)  {
+      console.log(error.message)
+      toast.error("an error has occured")
+    }}
+    
+
   useEffect(()=>{
+    getAuthorization()
     loadOrderData()
   },[token])
 
 
   return (
+    authorized
+    ?
     <div className='border-t pt-16'>
 
       <div className='text-2xl'>
@@ -79,6 +98,7 @@ const Orders = () => {
         }
       </div>
     </div>
+    :<h1 className='text-2xl'>This Page is Not Accessible</h1>
   )
 }
 

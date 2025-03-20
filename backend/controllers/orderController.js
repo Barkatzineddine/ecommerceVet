@@ -51,6 +51,20 @@ const allOrders = async (req,res) =>{
 
 }
 
+const DeliveredOrders = async (req,res) =>{
+
+    try{
+
+        const orders = await orderModel.find({status:"Delivered"})
+        res.json({success:true,orders})
+
+    }catch(error){
+        console.log(error)
+        res.json({success:false,message:error.message})
+    }
+
+}
+
 // User Order data For Frontend
 
 const userOrders = async (req,res) =>{
@@ -86,5 +100,23 @@ const updateStatus = async (req,res) =>{
 
 }
 
+const deleteOrder = async (req,res) => {
 
-export {placeOrder, allOrders, userOrders, updateStatus}
+    try{
+        
+        const {orderId} = req.body
+        console.log(orderId)
+        await orderModel.findByIdAndDelete(orderId)
+        res.json({success:true,message:'order deleted'})
+
+
+    }catch(error){  
+        
+        console.log(error)
+        res.json({success:false,message:error.message})
+    }
+
+}
+
+
+export {placeOrder, allOrders, userOrders, updateStatus,deleteOrder, DeliveredOrders}

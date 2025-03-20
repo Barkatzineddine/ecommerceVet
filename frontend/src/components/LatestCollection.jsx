@@ -5,7 +5,7 @@ import ProductItem from './ProductItem'
 
 const LatestCollection = () => {
 
-    const {products} = useContext(shopContext)
+    const {products,ratings} = useContext(shopContext)
     const [latestProducts,setLatestProducts] = useState([])
     console.log(products)
 
@@ -27,7 +27,7 @@ const LatestCollection = () => {
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6 '>
             {
                 latestProducts.map((item,index)=>(
-                    <ProductItem key={index} id={item._id} price={item.price} image={item.image} name={item.name}/>
+                    <ProductItem key={index} productId={item._id} id={item._id} sellingPrice={item.sellingPrice} image={item.image} name={item.name} category={item.category}/>
                 ))
             }
         </div>
