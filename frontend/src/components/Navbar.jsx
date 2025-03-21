@@ -129,9 +129,10 @@ const Navbar = () => {
                     <p>COLLECTION</p>
                 </NavLink>
 
-                <NavLink onClick={()=>setVisible(false)} to='/orders' className='py-3 pl-6 border' >
-                    <p>ORDERS</p>
-                </NavLink>
+               {authorized?<NavLink to='/orders' className='flex flex-col items-center gap-1 ' >
+                <p>ORDERS</p>
+                <hr className='border-none h-[2px] bg-gray-700 w-2/4 hidden'/>
+                </NavLink>:null}
 
                 <NavLink onClick={()=>setVisible(false)} to='/about' className='py-3 pl-6 border' >
                     <p>ABOUT</p>
