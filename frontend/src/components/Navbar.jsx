@@ -11,6 +11,7 @@ import { shopContext } from '../context/ShopContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
+
 const Navbar = () => {
 
     const [visible,setVisible] = useState(false)

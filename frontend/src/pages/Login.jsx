@@ -23,7 +23,8 @@ const Login = () => {
           setToken(response.data.token)
           localStorage.setItem('token',response.data.token)
         }else{
-          toast.error(response.data.message)
+          toast.error("An Error Has Occured")
+          console.log(response.data.message)
         }       
 
       }else{
@@ -34,14 +35,15 @@ const Login = () => {
           localStorage.setItem('token', response.data.token)
           toast.success("loged in successfully")
         }else{
-          toast.error(response.data.message)
+          toast.error("An Error Has Occured")
+          console.log(response.data.message)
         }
         
       }
 
     }catch(error){
       console.log(error.message);
-      toast.error(error.message)
+      toast.error("An Error Has Occured")
       
     }
   }

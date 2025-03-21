@@ -46,7 +46,7 @@ const Product = () => {
       if(item._id === productId){
       
         setProductData(item)
-        setImage(item.image[0])
+        
         return null
      }
     })
@@ -105,7 +105,7 @@ const Product = () => {
       <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
 
         {/* Product Images */}
-        <div className=' flex-1 min-w-0 flex flex-col-reverse gap-3 sm:flex-row '>
+        <div className=' flex-1 max-w-[700px] min-w-0 flex flex-col-reverse gap-3 sm:flex-row '>
 
           <div className={`max-h-[${maxScrollImagesHeight}] flex sm:flex-col overflow-x-auto overflow-y-scroll  sm:justify-normal sm:w-[22%] w-full`}>
             {

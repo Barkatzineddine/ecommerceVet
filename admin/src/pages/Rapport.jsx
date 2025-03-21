@@ -4,7 +4,7 @@ import axios from 'axios'
 import {backendUrl, currency} from '../App'
 import { assets } from '../assets/assets'
 import { rapportContext } from '../contex/rapportContext'
-
+import { BarChart, Bar, ResponsiveContainer,XAxis, YAxis } from 'recharts';
 
 
 const Rapport = ({token}) => {
@@ -15,6 +15,9 @@ const Rapport = ({token}) => {
     const [selectedYear, setSelectedYear] = useState(date.getFullYear());
     const [revenus, setRevenus] = useState(0)
     const [filteredOrders, setFilterOrders] = useState([])
+    const [itemCounts,setItemCounts] = useState({})
+    const [chartData,setChartData] = useState({})
+    console.log("again in rapport")
 
     const months = [
       "January", "February", "March", "April", "May", "June", 
@@ -43,21 +46,45 @@ const Rapport = ({token}) => {
               setFilterOrders(filteredOrders)
               totalAmount = filteredOrders.reduce((sum, order) => order?sum + order.amount:0, 0); 
               setRevenus(totalAmount)
+              const newItemCounts = {};
+              filteredOrders.forEach(order => {
+                order.items.forEach(item => {
+                  newItemCounts[item.name] = (newItemCounts[item.name] || 0) + item.quantity;
+                });
+              });
+              setItemCounts(newItemCounts); 
             
-            
-
         }catch(error){
           console.log(error.message)
           toast.error("an error has occured")
         }  
       }
 
-     
+      
+    
 
 
       useEffect(()=>{
         getRevenus()
+        const newChartData = Object.keys(itemCounts).map(name => ({
+          name,
+          quantity: itemCounts[name]
+        }));
+        setChartData(newChartData)
+        console.log(newChartData)
       },[selectedMonth,selectedYear,token,deliveredOrders])
+
+      useEffect(()=>{
+    
+        const newChartData = Object.keys(itemCounts).map(name => ({
+          name,
+          quantity: itemCounts[name]
+        }));
+        setChartData(newChartData)
+        console.log(newChartData)
+      },[filteredOrders])
+
+      
 
 
 
@@ -88,6 +115,23 @@ const Rapport = ({token}) => {
         <div>Total revenus of the month: {revenus} {currency}</div>
         <div>Total Product: {totalProducts}</div>
         <div>total sales for the month : {filteredOrders.filter(order => order !== undefined).length}</div>
+            {console.log('from return :',chartData)}
+
+
+      <h2 className='text-3xl text-indigo-700 border-b-2 my-10 w-fit'>Bar Chart :</h2>
+
+      <div className='h-[400px] mt-10 mb-5'>
+      
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart width={100} height={40} data={chartData}>
+        <XAxis dataKey="name" />
+        <YAxis allowDecimals={false} tickFormatter={(value) => Math.round(value)}  />
+          <Bar  barSize={70} dataKey="quantity" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+
+      </div>
+        
         
         
        
