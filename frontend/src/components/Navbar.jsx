@@ -1,5 +1,5 @@
 import React, { useContext, useState,useEffect } from 'react'
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
 import { NavLink } from 'react-router-dom';
 import searchIcon from "../assets/searchIcon.svg"
 import profileIcon from "../assets/profileIcon.svg"
