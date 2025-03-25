@@ -6,13 +6,14 @@ const placeOrder = async (req,res) => {
 
     try{
      
-        const {userId, items, amount, address} = req.body
+        const {userId, items, amount, address,purchaseAmount} = req.body
 
         const orderData = {
             userId,
             items,
             address,
             amount,
+            purchaseAmount,
             paymentMethod:"COD",
             payment:false,
             date: Date.now()

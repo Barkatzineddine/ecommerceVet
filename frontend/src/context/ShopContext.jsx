@@ -116,6 +116,26 @@ const ShopContextProvider = (props) => {
         return totalAmount;
     }
 
+    const getCartPurchaseAmount = () => {
+        let totalAmount = 0;
+       
+        for(const items in cartItems){
+            
+            let itemInfo = products.find((product) => product._id === items);
+            for(const item in cartItems[items]){
+                try{
+                    if(cartItems[items][item] > 0){
+                        totalAmount += itemInfo.purchasePrice * cartItems[items][item]
+                    }
+                }catch(error){
+                    console.log(error.message)
+                    toast.error(error.message)
+                }
+            }
+        }
+        return totalAmount;
+    }
+
     const getProductsData = async() => {
         try{
             const response = await axios.get(backendUrl + '/api/product/list')
@@ -190,7 +210,7 @@ const ShopContextProvider = (props) => {
     const value = {
         products,currency,delivery_fee,ratings,
         search,setSearch,showSearch,setShowSearch,
-        cartItems,addToCart,setCartItems,
+        cartItems,addToCart,setCartItems,getCartPurchaseAmount,
         getCartCount,updateQuantity,
         getCartAmount,navigate,backendUrl,
         setToken,token

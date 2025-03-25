@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
+import Title from '@/components/ui/Title'
 import {backendUrl, currency} from '../App'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
@@ -102,11 +103,12 @@ const Orders = ({token}) => {
 
   useEffect(()=>{
     fetchAllOrders()
+    console.log("from useEffect")
   },[token,date])
 
   return (
     <div className='relative'>
-        <h3>Order Page</h3>
+        <Title text={"Orders Page:"}/>
         <Popover>
                 <PopoverTrigger asChild>
                  
@@ -217,7 +219,7 @@ const Orders = ({token}) => {
 
                 <p className='text-sm sm:text-[15px]' >{order.amount} {currency}</p>
 
-                <select onChange={(e)=>statusHandler(e,order._id)} value={order.status} className='p-2 font-semibold bg-white'>
+                <select onChange={(e)=>statusHandler(e,order._id)} value={order.status} className='p-2 mt-6 font-semibold bg-white'>
                   <option value="Order Placed">Order Placed</option>
                   <option value="Packing">Packing</option>
                   <option value="Shipped">Shipped</option>

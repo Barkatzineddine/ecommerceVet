@@ -4,6 +4,7 @@ import axios from 'axios'
 import {backendUrl} from '../App'
 import { toast } from 'react-toastify'
 import ClipLoader from "react-spinners/ClipLoader";
+import Title from '@/components/ui/Title'
 
 const Add = ({token}) => {
 
@@ -75,7 +76,9 @@ const Add = ({token}) => {
   }
 
   return (
-    <>{
+    <>
+    <Title text={"Add Items Page:"}/>
+    {
       loading?
 
       <div className='w-full h-[100vh] flex flex-row justify-center items-center'>

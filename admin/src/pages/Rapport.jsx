@@ -1,10 +1,11 @@
 import React, { useState ,useEffect, useContext} from 'react'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import Title from '@/components/ui/Title'
+import Analysis from '@/components/ui/Analysis'
 import {backendUrl, currency} from '../App'
 import { assets } from '../assets/assets'
 import { rapportContext } from '../contex/rapportContext'
-import { BarChart, Bar, ResponsiveContainer,XAxis, YAxis } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer,XAxis, YAxis,Tooltip } from 'recharts';
 
 
 const Rapport = ({token}) => {
@@ -17,7 +18,7 @@ const Rapport = ({token}) => {
     const [filteredOrders, setFilterOrders] = useState([])
     const [itemCounts,setItemCounts] = useState({})
     const [chartData,setChartData] = useState({})
-    console.log("again in rapport")
+ 
 
     const months = [
       "January", "February", "March", "April", "May", "June", 
@@ -34,29 +35,34 @@ const Rapport = ({token}) => {
         try{
 
               var totalAmount = 0
+              var totalPurchaseAmount = 0
               const filteredOrders = deliveredOrders.map((order,index)=>{
               const date = new Date(order.date)
               const year = date.getFullYear()            
               const month = date.getMonth() + 1
               if(year == selectedYear && month == selectedMonth ){
-                console.log("2")
+             
                 return order
               }
             })
               setFilterOrders(filteredOrders)
               totalAmount = filteredOrders.reduce((sum, order) => order?sum + order.amount:0, 0); 
-              setRevenus(totalAmount)
-              const newItemCounts = {};
+              totalPurchaseAmount = filteredOrders.reduce((sum, order) => order?sum + order.purchaseAmount:0, 0); 
+              setRevenus(totalAmount - totalPurchaseAmount)
+              var newItemCounts = {};
               filteredOrders.forEach(order => {
-                order.items.forEach(item => {
+
+                  if(order){order.items.forEach(item => {
                   newItemCounts[item.name] = (newItemCounts[item.name] || 0) + item.quantity;
-                });
+                })}else{
+                  newItemCounts ={}
+                };
               });
               setItemCounts(newItemCounts); 
             
         }catch(error){
-          console.log(error.message)
-          toast.error("an error has occured")
+          console.log(error)
+          toast.error(error.message)
         }  
       }
 
@@ -71,7 +77,7 @@ const Rapport = ({token}) => {
           quantity: itemCounts[name]
         }));
         setChartData(newChartData)
-        console.log(newChartData)
+        console.log("from useEffect")
       },[selectedMonth,selectedYear,token,deliveredOrders])
 
       useEffect(()=>{
@@ -81,7 +87,6 @@ const Rapport = ({token}) => {
           quantity: itemCounts[name]
         }));
         setChartData(newChartData)
-        console.log(newChartData)
       },[filteredOrders])
 
       
@@ -91,7 +96,7 @@ const Rapport = ({token}) => {
 
   return (
     <div className='relative'>
-        <div>Rapport</div>
+        <Title text="Rapport Page:"/>
         <div className='absolute right-2 top-2'>
 
 
@@ -111,21 +116,20 @@ const Rapport = ({token}) => {
           </select>
 
         </div>
-        
-        <div>Total revenus of the month: {revenus} {currency}</div>
-        <div>Total Product: {totalProducts}</div>
-        <div>total sales for the month : {filteredOrders.filter(order => order !== undefined).length}</div>
-            {console.log('from return :',chartData)}
+
+        <Analysis currency={currency} totalRevenus={revenus} totalProduct={totalProducts} totalSales={filteredOrders.filter(order => order !== undefined).length}/>
+           
 
 
       <h2 className='text-3xl text-indigo-700 border-b-2 my-10 w-fit'>Bar Chart :</h2>
 
-      <div className='h-[400px] mt-10 mb-5'>
+      <div className='h-[550px] mt-10 mb-5 p-10 bg-white rounded-lg'>
       
       <ResponsiveContainer width="100%" height="100%">
         <BarChart width={100} height={40} data={chartData}>
-        <XAxis dataKey="name" />
+        <XAxis className='text-sm' dataKey="name" />
         <YAxis allowDecimals={false} tickFormatter={(value) => Math.round(value)}  />
+          <Tooltip />
           <Bar  barSize={70} dataKey="quantity" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>

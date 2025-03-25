@@ -8,7 +8,7 @@ import axios from 'axios';
 const PlaceOrder = () => {
 
   const [method,setMethod] = useState('cod');
-  const {navigate,backendUrl,token,cartItems,setCartItems,getCartAmount,delivery_fee,products} = useContext(shopContext)
+  const {navigate,backendUrl,token,cartItems,setCartItems,getCartAmount,delivery_fee,products,getCartPurchaseAmount} = useContext(shopContext)
   const [formData,setFormData] = useState({
     firstName:'',
     lastName:'',
@@ -50,7 +50,8 @@ const PlaceOrder = () => {
       let orderData = {
         address: formData,
         items: orderItems,
-        amount:getCartAmount() + delivery_fee
+        amount:getCartAmount() + delivery_fee,
+        purchaseAmount: getCartPurchaseAmount()
       }
 
       switch(method){

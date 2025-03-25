@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import ClipLoader from "react-spinners/ClipLoader";
+import Title from '@/components/ui/Title'
 
 const List = ({token}) => {
 
@@ -59,7 +60,7 @@ const List = ({token}) => {
 
   return (
     <div className='relative'>
-      <p className='mb-2'>All Products List</p>
+      <Title text={"Products List Page:"}/>
       <div>Total Product: {totalProducts}</div>
 
       {!list? 
