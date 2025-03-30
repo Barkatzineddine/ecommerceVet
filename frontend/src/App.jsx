@@ -30,10 +30,13 @@ export default function App() {
       const response = await axios.post(backendUrl + '/api/order/userorders',{},{headers:{token}})
       if (response.data.success){
         setAuthorized(true)
+      }else{
+        localStorage.removeItem('token')
       }
 
     }catch(error)  {
       console.log(error.message)
+      localStorage.removeItem('token')
       toast.error("an error has occured")
     }}
     

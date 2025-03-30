@@ -1,11 +1,13 @@
 import React from 'react'
-import { useContext } from 'react'
+import { useContext,useMemo } from 'react'
 import { shopContext } from '../context/ShopContext'
 import Title from './Title'
 
 const CartTotal = () => {
 
     const {currency,delivery_fee,getCartAmount} = useContext(shopContext)
+
+    const cartAmount = useMemo(() => getCartAmount(), [getCartAmount]);
 
 
   return (
@@ -17,7 +19,7 @@ const CartTotal = () => {
         <div className='flex flex-col gap-2 mt-2 text-sm'>
             <div className='flex justify-between'>
                 <p>Subtotal</p>
-                <p>{currency} {getCartAmount()}.00</p>
+                <p>{currency} {cartAmount}.00</p>
             </div>    
             <hr />
             <div className='flex justify-between'>
@@ -27,7 +29,7 @@ const CartTotal = () => {
             <hr />
             <div className='flex justify-between'>
                 <b>Total</b>
-                <b>{currency} {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee}.00</b>
+                <b>{currency} {cartAmount === 0 ? 0 : cartAmount + delivery_fee}.00</b>
             </div>
         </div>
     </div>

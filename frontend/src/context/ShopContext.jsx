@@ -32,6 +32,7 @@ const ShopContextProvider = (props) => {
             return 0
         }
 
+        console.log(cartItems)
         let cartData = structuredClone(cartItems)
 
         if(cartData[itemId]) {
@@ -43,7 +44,8 @@ const ShopContextProvider = (props) => {
         }else{
             cartData[itemId] = {};
             cartData[itemId][size] = 1;
-        }
+        }       
+        localStorage.setItem('cart',JSON.stringify(cartData))
         setCartItems(cartData)
 
         if(token){
@@ -80,6 +82,7 @@ const ShopContextProvider = (props) => {
         cartData[itemId][size] = quantity;
 
         setCartItems(cartData)
+        localStorage.setItem('cart',cartData)
 
         if (token) {
             try{
@@ -108,8 +111,7 @@ const ShopContextProvider = (props) => {
                         totalAmount += itemInfo.sellingPrice * cartItems[items][item]
                     }
                 }catch(error){
-                    console.log(error.message)
-                    toast.error(error.message)
+                    
                 }
             }
         }
@@ -172,22 +174,49 @@ const ShopContextProvider = (props) => {
 
     const getUserCart = async () =>{
 
-        try{
+        if(token){
 
-            const response = await axios.post(backendUrl + '/api/cart/get',{},{headers:{token}})
+            localStorage.removeItem('cart')
+
+            try{
+
+                const response = await axios.post(backendUrl + '/api/cart/get',{},{headers:{token}})
             
-            if (response.data.success){
-                setCartItems(response.data.cartData)
+                if (response.data.success){
+                    setCartItems(response.data.cartData)
                
+                }else{
+                    //console.log(response.data)
+                }
+
+            }catch(error){
+                console.log(error.message)
+                toast.error(error.message)
+            }
             }else{
-                //console.log(response.data)
+                try{
+                    if(localStorage.getItem('cart')){
+                        let cart = JSON.parse(localStorage.getItem('cart'))
+                        console.log(cart)
+                        console.log(products.length)
+                        if (products.length > 0) {
+                            const filteredCart = Object.fromEntries(
+                              Object.entries(cart).filter(([key]) =>
+                                products.some((product) => product._id === key)
+                              )
+                            );
+                            setCartItems(filteredCart);
+                            localStorage.setItem('cart', JSON.stringify(filteredCart))
+                          }
+                       
+                    }
+                }catch(error){
+                    localStorage.removeItem('cart')
+                    setCartItems({})
+                }
             }
 
-        }catch(error){
-            console.log(error.message)
-            toast.error(error.message)
         }
-    }
 
     useEffect(()=>{
         getProductsData()
@@ -205,7 +234,7 @@ const ShopContextProvider = (props) => {
 
         getUserCart()
 
-    },[token])
+    },[token,products])
   
     const value = {
         products,currency,delivery_fee,ratings,
