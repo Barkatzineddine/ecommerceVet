@@ -52,12 +52,10 @@ const RapportContextProvider = (props) => {
 
       const updateQuantity = async (itemId,quantity) => {
 
-
-
         if (token) {
             try{
 
-                const response = await axios.post(backendUrl + '/api/product/update',{itemId,quantity}, {headers:{token}})
+                const response = await axios.post(backendUrl + '/api/product/updateQuantity',{itemId,quantity}, {headers:{token}})
                 if (response.data.success){
                   toast.success("Product Quantity Updated")
                 }else{
@@ -74,7 +72,52 @@ const RapportContextProvider = (props) => {
         }
     }
 
-      
+    const updatePrice = async (itemId,price) => {
+
+      if (token) {
+          try{
+
+              const response = await axios.post(backendUrl + '/api/product/updatePrice',{itemId,price}, {headers:{token}})
+              if (response.data.success){
+                return response
+              }else{
+                console.error(response.data.message)  
+                toast.error("Error while Updating Product Price") 
+                return response          
+              }
+
+          }catch(error){
+
+              console.log(error)
+              toast.error(error.message)
+
+          }
+      }
+  }
+
+  const setPromoPrice = async (itemId,price) => {
+
+    if (token) {
+        try{
+
+            const response = await axios.post(backendUrl + '/api/product/setPromoPrice',{itemId,price}, {headers:{token}})
+            if (response.data.success){
+              return response
+            }else{
+              console.error(response.data.message)  
+              toast.error("Error while Updating Product Price") 
+              return response          
+            }
+
+        }catch(error){
+
+            console.log(error)
+            toast.error(error.message)
+
+        }
+    }
+}
+
 
       useEffect(()=>{
         if (!token && localStorage.getItem('token')){
@@ -91,7 +134,7 @@ const RapportContextProvider = (props) => {
 
 
     const value = {
-       token,totalProducts,deliveredOrders,updateQuantity
+       token,totalProducts,deliveredOrders,updateQuantity,updatePrice,setPromoPrice
     }
 
     return(

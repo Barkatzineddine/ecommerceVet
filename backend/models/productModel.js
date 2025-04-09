@@ -13,7 +13,9 @@ const productSchema = new mongoose.Schema({
     sizes:{type:Array, required:true},
     bestseller:{type:Boolean},
     date:{type:Number, required:true},
-    quantity:{type:Number, required:true, default:1}
+    quantity:{type:Number, required:true, default:1},
+    onPromotion:{type:Boolean,default:false},
+    promotionPrice:{type:Number,default:0}
      
 })
 

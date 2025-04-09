@@ -76,8 +76,7 @@ const Rapport = ({token}) => {
           name,
           quantity: itemCounts[name]
         }));
-        setChartData(newChartData)
-        console.log("from useEffect")
+        setChartData(newChartData.slice(0,10))
       },[selectedMonth,selectedYear,token,deliveredOrders])
 
       useEffect(()=>{
@@ -86,7 +85,7 @@ const Rapport = ({token}) => {
           name,
           quantity: itemCounts[name]
         }));
-        setChartData(newChartData)
+        setChartData(newChartData.slice(0,10))
       },[filteredOrders])
 
       
@@ -123,14 +122,14 @@ const Rapport = ({token}) => {
 
       <h2 className='text-3xl text-indigo-700 border-b-2 my-10 w-fit'>Bar Chart :</h2>
 
-      <div className='h-[550px] mt-10 mb-5 p-10 bg-white rounded-lg'>
-      
+      <div className='text-sm h-[550px] mt-10 mb-5 p-10 bg-white rounded-lg'>
+     
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart width={100} height={40} data={chartData}>
-        <XAxis className='text-sm' dataKey="name" />
+        <BarChart width={100} height={40} data={chartData} >
+        <XAxis className='text-xs h-fit ' dataKey="name" />
         <YAxis allowDecimals={false} tickFormatter={(value) => Math.round(value)}  />
           <Tooltip />
-          <Bar  barSize={70} dataKey="quantity" fill="#8884d8" />
+          <Bar  barSize={30} dataKey="quantity" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
 

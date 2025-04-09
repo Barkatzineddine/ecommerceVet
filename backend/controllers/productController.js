@@ -109,7 +109,7 @@ const singleProduct = async (req,res) =>{
 
 //Update products
 
-const updateProduct = async(req,res)=>{
+const updateProductQuantity = async(req,res)=>{
 
     try{
 
@@ -118,6 +118,57 @@ const updateProduct = async(req,res)=>{
         await productModel.findByIdAndUpdate(itemId,{quantity})
 
         res.json({success: true, message: "Product Quantity Updated"})
+
+    }catch(error){
+        console.log(error)
+        res.json({success:false, message:error.message})
+    }
+
+}
+
+const onPromotion = async(req,res)=>{
+
+    try{
+
+        const {id,checked} = req.body
+
+        await productModel.findByIdAndUpdate(id,{onPromotion:checked})
+        res.json({success: true, message: "Product Quantity Updated"})
+
+    }catch(error){
+        console.log(error)
+        res.json({success:false, message:error.message})
+    }
+
+}
+
+const updateProductPrice = async(req,res)=>{
+
+    try{
+
+        const {itemId,price} = req.body
+
+        await productModel.findByIdAndUpdate(itemId,{sellingPrice:price})
+
+        res.json({success: true, message: "Product Price Updated"})
+
+    }catch(error){
+        console.log(error)
+        res.json({success:false, message:error.message})
+    }
+
+}
+
+
+const setPromoPrice = async(req,res)=>{
+
+    try{
+
+        const {itemId,price} = req.body
+
+        await productModel.findByIdAndUpdate(itemId,{promotionPrice:price})
+
+        res.json({success: true, message: "Promotion Price Updated"})
 
     }catch(error){
         console.log(error)
@@ -168,5 +219,6 @@ const setRating= async (req,res) =>{
 
 }
 
-export {listProducts,addProduct,removeProduct,singleProduct,setRating, updateProduct}
+export {listProducts,addProduct,removeProduct,singleProduct,setRating,
+     updateProductQuantity, updateProductPrice, onPromotion, setPromoPrice}
 

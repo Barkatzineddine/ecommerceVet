@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom'
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import shoppingIcon from '../assets/shoppingIcon.png'
+import promoPic from '../assets/promo.png'
 
-const ProductItem = ({id,image,name,sellingPrice,category,productId}) => {
+const ProductItem = ({id,image,name,sellingPrice,category,productId,onPromotion,promotionPrice}) => {
   
     const [totalRating,setTotalRating] = useState(0)
     const {currency,ratings} = useContext(shopContext)
@@ -29,15 +30,23 @@ const ProductItem = ({id,image,name,sellingPrice,category,productId}) => {
   return (
     
     <Link className='relative shadow-md rounded-[25px] text-gray-700 cursor-pointer px-[10px] pt-[10px] pb-[12px] border-slate-200 border-solid border-[1px]  hover:scale-110 transition ease-in-out' to={`/product/${id}`}>
-        <div>
+        <div className='relative'>
             <img className='w-full rounded-[20px] object-cover aspect-[171/192] h-full  ' src={image[0]} alt={`${name}`} />
+            {onPromotion?
+            <img  src={promoPic} alt='promo' className='absolute w-[90px] top-0 left-0'/>
+            :null}
         </div>
         <p className='pt-1 pb-1 pl-1 r text-xs text-slate-400 font-semibold '>{category}</p>
         <p className='p pl-1 text-xs  lg: font-extrabold'>{name}</p>
         <Stack spacing={1}>
           <Rating name="half-rating-read" size='small' value={totalRating} precision={0.5} readOnly />
         </Stack>
-        <p className='text-sm  pt-1  font-semibold pl-1'> {sellingPrice} {currency}</p>
+        <p className='text-sm  pt-1  font-semibold pl-1'>{onPromotion?
+                                                          <>
+                                                            <p className='line-through mr-3 inline'>{sellingPrice}{currency}</p>
+                                                            <p className='text-red-500 inline'>{promotionPrice}{currency}</p>
+                                                          </>                                               
+                                                          :<p>{sellingPrice} {currency}</p>}</p>
         {/*<div className="rounded-full p-2 w-fit absolute bottom-1 right-2 cursor-pointer hover:bg-slate-200"> 
           <img src={shoppingIcon} alt="shopingIcon" className='w-4' />
         </div>*/}

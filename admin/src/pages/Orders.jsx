@@ -20,6 +20,7 @@ import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import ClipLoader from "react-spinners/ClipLoader";
+import Swal from 'sweetalert2'
 
 
 const Orders = ({token}) => {
@@ -93,6 +94,9 @@ const Orders = ({token}) => {
       if(response.data.success){
         toast.success("order deleted")
         fetchAllOrders()
+      }else{
+        toast.error(response.data.message)
+        throw new Error(response.data.message)
       }
 
     }catch(error){
@@ -103,7 +107,6 @@ const Orders = ({token}) => {
 
   useEffect(()=>{
     fetchAllOrders()
-    console.log("from useEffect")
   },[token,date])
 
   return (
@@ -188,12 +191,11 @@ const Orders = ({token}) => {
 
                       if (index === order.items.length - 1){
 
-                        return <p  className='py-0.5' key={item._id}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
+                        return <p className='py-0.5' key={item._id}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
 
                       }else{
 
-                        return <p className='py-0.5' key={item._id}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
-
+                        <p className='py-0.5' key={item._id}>{item.name} x {item.quantity} <span>{item.size}</span> </p>
 
                       }
 
@@ -229,7 +231,30 @@ const Orders = ({token}) => {
                 
                 <div className='absolute right-1 top-2 w-fit'>
                   <div className='flex justify-between items-center'>
-                    <img onClick={(e)=>deleteOrder(e,order._id)} src={assets.remove_icon} alt="cancel" className='w-[28px] ml-2 p-1 rounded-full cursor-pointer hover:bg-slate-300'/>
+                    <img onClick={async (e)=>{
+                        Swal.fire({
+                          title: "Are you sure?",
+                          text: "You won't be able to revert this!",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#3085d6",
+                          cancelButtonColor: "#d33",
+                          confirmButtonText: "Yes, delete it!"
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            deleteOrder(e,order._id)
+                              .then(() => {
+                                Swal.fire({
+                                  title: "Deleted!",
+                                  text: "Your file has been deleted.",
+                                  icon: "success"
+                                });
+                              })                
+                          }
+                        });                       
+                        }}
+                      
+                       src={assets.remove_icon} alt="cancel" className='w-[28px] ml-2 p-1 rounded-full cursor-pointer hover:bg-slate-300'/>
                   </div>
                   
                 </div>
